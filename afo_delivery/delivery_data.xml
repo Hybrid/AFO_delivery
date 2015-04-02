@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+    	<record id="mt_env_changed" model="mail.message.subtype">
+            <field name="name">Environment was changed:</field>
+            <field name="res_model">afo_delivery.environment</field>
+            <field name="default" eval="True"/>
+            <field name="description"></field>
+        </record>
+        <record id="mt_env_delivery_changed" model="mail.message.subtype">
+            <field name="name">Deliveries</field>
+            <field name="res_model">afo_delivery.environment</field>
+            <field name="default" eval="True"/>
+            <field name="description"></field>
+        </record>
+    </data>
+</openerp>

@@ -11,6 +11,9 @@ class afo_delivery_environment(models.Model):
         },
         'component_ids':{
             'afo_delivery.mt_env_changed': lambda self, cr, uid, obj, ctx=None: obj.component_ids,
+        },
+        'delivery_ids':{
+            'afo_delivery.mt_env_delivery_changed': lambda self, cr, uid, obj, ctx=None: obj.delivery_ids,
         }
     }
 
@@ -133,7 +136,7 @@ class afo_delivery_environment_delivery(models.Model):
                 message += 'A problem occured during the installation of the delivery!'
             elif rec.install_status == 'completed':
                 message += 'Successfully deployed!'
-            env_obj.message_post(cr, uid, [rec.environment_id.id], body=message, context=context)
+            env_obj.message_post(cr, uid, [rec.environment_id.id], body=message, context=context, subtype='mt_env_delivery_changed')
         return res
 
 class afo_delivery_delivery_component(models.Model):

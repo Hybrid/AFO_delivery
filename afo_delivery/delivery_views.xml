@@ -5,13 +5,6 @@
         <menuitem name="Delivery" id="afo_delivery_menu" />
 
         <!-- Environments -->
-        <record id="mt_env_changed" model="mail.message.subtype">
-            <field name="name">Environment was changed:</field>
-            <field name="res_model">afo_delivery.environment</field>
-            <field name="default" eval="True"/>
-            <field name="description"></field>
-        </record>
-
         <record model="ir.ui.view" id="afo_delivery_environment_form">
             <field name="name">environment.form</field>
             <field name="model">afo_delivery.environment</field>
