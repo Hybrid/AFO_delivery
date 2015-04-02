@@ -32,6 +32,17 @@
                             </tree>
                         </field>
                     </group>
+                    <group>
+                        <field name="delivery_ids" context="{'default_environment_id': active_id, 'default_install_user': uid}">
+                            <tree string="Installed Deliveries">
+                                <field name="delivery_id"/>
+                                <field name="install_status"/>
+                                <field name="planned_date"/>
+                                <field name="install_date"/>
+                                <field name="install_user"/>
+                            </tree>
+                        </field>
+                    </group>
                 </form>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/> 

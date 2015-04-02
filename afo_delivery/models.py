@@ -24,6 +24,7 @@ class afo_delivery_environment(models.Model):
         """, default='active', track_visibility='onchange' )
     is_production = fields.Boolean(string='Production Environment?',default=False)
     component_ids = fields.One2many('afo_delivery.environment_component', 'environment_id', 'Installed Component', track_visibility='onchange')
+    delivery_ids = fields.One2many('afo_delivery.environment_delivery', 'environment_id', 'Installed Deliveries', track_visibility='onchange')
 
 class afo_delivery_component_type(models.Model):
     _name = 'afo_delivery.component_type'
@@ -96,6 +97,7 @@ class afo_delivery_delivery(models.Model):
 class afo_delivery_environment_delivery(models.Model):
     _name = 'afo_delivery.environment_delivery'
 
+    name = fields.Char(compute='_compute_name')
     environment_id = fields.Many2one('afo_delivery.environment', 'Environment', required=True)
     delivery_id = fields.Many2one('afo_delivery.delivery', 'Delivery', required=True)
     install_date = fields.Date('Installation Date')
@@ -108,10 +110,32 @@ class afo_delivery_environment_delivery(models.Model):
                     \n Completed: Delivery was successfully installed """, default='planned')
     planned_date = fields.Date('Planned Date')
 
+    def _compute_name(self):
+        for rec in self:
+            rec.name = '%s [%s]: %s' % (rec.delivery_id.name, rec.environment_id.name, rec.install_status)
+
+    def write(self, cr, uid, ids, vals, context=None):
+        res = super(afo_delivery_environment_delivery, self).write(cr, uid, ids, vals, context=context)
+        env_obj = self.pool.get('afo_delivery.environment')
+        for rec in self.browse(cr, uid, ids, context=context):
+            message = '<span>[%s] - Delivery [%s] was changed</span> <br/>' % (rec.environment_id.name, rec.delivery_id.name)
+            if rec.install_status == 'planned':
+                if rec.planned_date:
+                    message += 'Installation is planned on %s' % str(rec.planned_date)
+                else:
+                    message += 'Installation is planned but no date were provided'
+            elif rec.install_status == 'in_progress':
+                message += 'Installation of this delivery is in progress!'
+            elif rec.install_status == 'failed':
+                message += 'A problem occured during the installation of the delivery!'
+            elif rec.install_status == 'completed':
+                message += 'Successfully deployed!'
+            env_obj.message_post(cr, uid, [rec.environment_id.id], body=message, context=context)
+        return res
 
 class afo_delivery_delivery_component(models.Model):
     _name = 'afo_delivery.delivery_component'
 
     delivery_id = fields.Many2one('afo_delivery.delivery', 'Delivery', required=True)
-    component_id = fields.Many2one('afo_delivery.component', 'Component', required=True)
+    component_id = fields.Many2one('afo_delivery.component_type', 'Component', required=True)
 
