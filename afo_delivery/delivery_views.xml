@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <menuitem name="Delivery" id="afo_delivery_menu" />
+
+        <!-- Environments -->
+        <record id="mt_env_changed" model="mail.message.subtype">
+            <field name="name">Environment was changed:</field>
+            <field name="res_model">afo_delivery.environment</field>
+            <field name="default" eval="True"/>
+            <field name="description"></field>
+        </record>
+
+        <record model="ir.ui.view" id="afo_delivery_environment_form">
+            <field name="name">environment.form</field>
+            <field name="model">afo_delivery.environment</field>
+            <field name="arch" type="xml">
+                <form string="Environment Form">
+                    <group>
+                        <field name="name"/>
+                        <field name="description" />
+                        <field name="env_status" />
+                        <field name="is_production" />
+                    </group>
+                    <group>
+                        <field name="component_ids" context="{'default_environment_id': active_id, 'default_install_user': uid}">
+                            <tree string="Installed Components">
+                                <field name="name"/>
+                                <field name="install_date"/>
+                                <field name="install_user"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/> 
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="afo_delivery_environment_tree">
+            <field name="name">environment.tree</field>
+            <field name="model">afo_delivery.environment</field>
+            <field name="arch" type="xml">
+                <tree string="Environment List">
+                    <field name="name"/>
+                    <field name="description" />
+                    <field name="env_status" />
+                    <field name="is_production" />
+                </tree>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="afo_delivery_environment_list_action">
+            <field name="name">Manage Environments</field>
+            <field name="res_model">afo_delivery.environment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field> 
+        </record>
+        
+    <!-- Component Types -->
+        <record model="ir.ui.view" id="afo_delivery_component_type_form">
+            <field name="name">component_type.form</field>
+            <field name="model">afo_delivery.component_type</field>
+            <field name="arch" type="xml">
+                <form string="component type Form">
+                    <group>
+                        <field name="name"/>
+                        <field name="description" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="afo_delivery_component_type_tree">
+            <field name="name">component_type.tree</field>
+            <field name="model">afo_delivery.component_type</field>
+            <field name="arch" type="xml">
+                <tree string="Component Type List">
+                    <field name="name"/>
+                    <field name="description" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="afo_delivery_component_type_list_action">
+            <field name="name">Manage Components Types</field>
+            <field name="res_model">afo_delivery.component_type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field> 
+        </record>
+
+
+        <!-- Deliveries -->
+        <record model="ir.ui.view" id="afo_delivery_delivery_form">
+            <field name="name">delivery.form</field>
+            <field name="model">afo_delivery.delivery</field>
+            <field name="arch" type="xml">
+                <form string="delivery Form">
+                    <header>
+                        <button name="deploy_to_environment" string="Deploy" type="object" class="oe_highlight" />
+                        <button name="discard" string="Discard" type="object" class="oe_highlight" />
+                    </header>
+                    <group>
+                        <field name="name"/>
+                        <field name="delivery_date"/>
+                        <field name="crm_defect_idt"/>
+                        <field name="external_defect_idt"/>
+                        <field name="owner_name"/>
+                        <field name="description" />
+                        <field name="del_status" />
+                        <field name="content"/>
+                    </group>
+                    <group>
+                        <field name="environment_ids" context="{'default_delivery_id': active_id, 'default_install_user':uid}">
+                            <tree string="Installation">
+                                <field name="environment_id"/>
+                                <field name="install_date"/>
+                                <field name="install_user"/>
+                                <field name="install_status"/>
+                                <field name="planned_date"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group>
+                        <field name="component_ids" context="{'default_delivery_id':active_id}">
+                            <tree string="Impacted Components">
+                                <field name="component_id"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="afo_delivery_delivery_tree">
+            <field name="name">delivery.tree</field>
+            <field name="model">afo_delivery.delivery</field>
+            <field name="arch" type="xml">
+                <tree string="Delivery List">
+                    <field name="name"/>
+                    <field name="delivery_date"/>
+                    <field name="crm_defect_idt"/>
+                    <field name="external_defect_idt"/>
+                    <field name="description" />
+                    <field name="del_status" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="afo_delivery_delivery_list_action">
+            <field name="name">All Deliveries</field>
+            <field name="res_model">afo_delivery.delivery</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field> 
+        </record>
+
+        <!-- Deliveries - More -->
+        <record id="afo_delivery_delivery_discard" model="ir.actions.server">
+            <field name="name">Discard</field>
+            <field name="model_id" ref="model_afo_delivery_delivery"/>
+            <field name="code"> r = self.discard(cr, uid, context.get('active_ids', []), context=context)</field>
+        </record>
+
+        <record id="action_afo_delivery_delivery_discard" model="ir.values">
+            <field eval="'client_action_multi'" name="key2"/>
+            <field eval="'afo_delivery.delivery'" name="model"/>
+            <field name="name">Discard</field>
+            <field eval="'ir.actions.server,%d'%afo_delivery_delivery_discard" name="value"/>
+        </record>
+
+        <!-- Delivery Installation -->
+        <record model="ir.ui.view" id="afo_delivery_environment_delivery_form">
+            <field name="name">environment_delivery.form</field>
+            <field name="model">afo_delivery.environment_delivery</field>
+            <field name="arch" type="xml">
+                <form string="Installation Form">
+                    <group>
+                        <field name="delivery_id"/>
+                        <field name="environment_id"/>
+                        <field name="install_date"/>
+                        <field name="install_user"/>
+                        <field name="install_status"/>
+                        <field name="planned_date" attrs="{'invisible':[('install_status', '!=', 'planned')]}"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <menuitem name="Deliveries" id="delivery_menu"  parent="afo_delivery_menu"/>
+        <menuitem name="All Deliveries" id="delivery_list_action" action="afo_delivery_delivery_list_action" parent="delivery_menu"/>
+
+        <menuitem name="Environments" id="environment_menu" parent="afo_delivery_menu"/>
+        <menuitem name="Manage Environments" id="environment_manage_action" action="afo_delivery_environment_list_action" parent="environment_menu"/>
+
+        <menuitem name="Components" id="component_menu"  parent="afo_delivery_menu"/>
+        <menuitem name="Manage Components Types" id="component_type_manage_action" action="afo_delivery_component_type_list_action" parent="component_menu"/>
+    </data>
+</openerp>
