@@ -118,12 +118,13 @@ class afo_delivery_environment_delivery(models.Model):
     delivery_id = fields.Many2one('afo_delivery.delivery', 'Delivery', required=True)
     install_date = fields.Date('Installation Date')
     install_user = fields.Many2one('res.users', string='Installed by')
-    install_status = fields.Selection([('planned', 'Planned'), ('in_progress', 'In Progress'), ('failed', 'Failed'), ('completed', 'Completed')], 'Installation Status',
+    install_status = fields.Selection([('planned', 'Planned'), ('in_progress', 'In Progress'), ('failed', 'Failed'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], 'Installation Status',
                     help=""" * Status of the delivery installation:
                     \n Planned: Delivery has been planned to be installed on this environment at the planned date
                     \n In Progress: Delivery is currently being installed on the environment
                     \n Failed: Installation of the delivery failed
-                    \n Completed: Delivery was successfully installed """, default='planned')
+                    \n Completed: Delivery was successfully installed
+                    \n Cancelled: Installation on this envronment was cancelled""", default='planned')
     planned_date = fields.Date('Planned Date')
 
     def _compute_name(self):
@@ -147,6 +148,8 @@ class afo_delivery_environment_delivery(models.Model):
                 message += 'A problem occured during the installation of the delivery!'
             elif rec.install_status == 'completed':
                 message += 'Successfully deployed!'
+            elif rec.install_status == 'cancelled':
+                message += 'This installation was cancelled'
             env_obj.message_post(cr, uid, [rec.environment_id.id], body=message, context=context, subtype='mt_env_delivery_changed')
             del_obj.message_post(cr, uid, [rec.delivery_id.id], body=message, context=context, subtype='mt_del_deployed')
         return res
