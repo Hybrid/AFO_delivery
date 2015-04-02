@@ -26,7 +26,7 @@
                         </field>
                     </group>
                     <group>
-                        <field name="delivery_ids" context="{'default_environment_id': active_id, 'default_install_user': uid}">
+                        <field name="delivery_ids" context="{'default_environment_id': active_id, 'default_install_user': uid, 'default_from_view':'env_view'}">
                             <tree string="Installed Deliveries">
                                 <field name="delivery_id"/>
                                 <field name="install_status"/>
@@ -119,7 +119,7 @@
                         <field name="content"/>
                     </group>
                     <group>
-                        <field name="environment_ids" context="{'default_delivery_id': active_id, 'default_install_user':uid}">
+                        <field name="environment_ids" context="{'default_delivery_id': active_id, 'default_install_user':uid, 'default_from_view':'del_view'}">
                             <tree string="Installation">
                                 <field name="environment_id"/>
                                 <field name="install_date"/>
@@ -193,6 +193,7 @@
                         <field name="install_user"/>
                         <field name="install_status"/>
                         <field name="planned_date" attrs="{'invisible':[('install_status', '!=', 'planned')]}"/>
+                        <field name="from_view" attrs="{'invisible': True}"/>
                     </group>
                 </form>
             </field>

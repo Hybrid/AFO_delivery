@@ -98,7 +98,7 @@ class afo_delivery_delivery(models.Model):
         \n Production: The delivery has been installed on the production environment and is LIVE
         """, default='new')
     owner_name = fields.Char('Owner', help=""" The person who made the delivery""")
-    environment_ids = fields.One2many('afo_delivery.environment_delivery', 'delivery_id', 'Installation')
+    environment_ids = fields.One2many('afo_delivery.environment_delivery', 'delivery_id', 'Installation', track_visibility='onchange')
     component_ids = fields.One2many('afo_delivery.delivery_component', 'delivery_id', 'Components Impacted')
 
     def deploy_to_environment(self, cr, uid, id, context=None):
@@ -126,10 +126,28 @@ class afo_delivery_environment_delivery(models.Model):
                     \n Completed: Delivery was successfully installed
                     \n Cancelled: Installation on this envronment was cancelled""", default='planned')
     planned_date = fields.Date('Planned Date')
+    #technical field used to know from which view we are coming from. Used only for propagation of information to followers!
+    from_view = fields.Char()
 
     def _compute_name(self):
         for rec in self:
-            rec.name = '%s [%s]: %s' % (rec.delivery_id.name, rec.environment_id.name, rec.install_status)
+            rec.name = '%s - [%s]: %s' % (rec.delivery_id.name, rec.environment_id.name, rec.install_status)
+
+    def create(self, cr, uid, vals, context=None):
+        res = super(afo_delivery_environment_delivery, self).create(cr, uid, vals, context=context)
+        env_obj = self.pool.get('afo_delivery.environment')
+        del_obj = self.pool.get('afo_delivery.delivery')
+        for rec in self.browse(cr, uid, res, context=context):
+            message = '<span> %s </span> <br/>' % (rec.name)
+            # Only propagate information to the other part of the many2many relationship since it is already tracked when working from the main model.
+            if rec.from_view == 'env_view':
+                del_obj.message_post(cr, uid, [rec.delivery_id.id], body=message, context=context, subtype='mt_del_deployed')
+            elif rec.from_view == 'del_view':
+                env_obj.message_post(cr, uid, [rec.environment_id.id], body=message, context=context, subtype='mt_env_delivery_changed')
+            else:
+                del_obj.message_post(cr, uid, [rec.delivery_id.id], body=message, context=context, subtype='mt_del_deployed')
+                env_obj.message_post(cr, uid, [rec.environment_id.id], body=message, context=context, subtype='mt_env_delivery_changed')
+        return res
 
     def write(self, cr, uid, ids, vals, context=None):
         res = super(afo_delivery_environment_delivery, self).write(cr, uid, ids, vals, context=context)
