@@ -73,6 +73,16 @@ class afo_delivery_delivery(models.Model):
     _name = 'afo_delivery.delivery'
     _order = 'delivery_date desc'
 
+    _inherit = 'mail.thread'
+    _track = {
+        'del_status' : {
+            'afo_delivery.mt_del_status': lambda self, cr, uid, obj, ctx=None: obj.del_status,
+        },
+        'environment_ids':{
+            'afo_delivery.mt_del_deployed': lambda self, cr, uid, obj, ctx=None: obj.environment_ids,
+        },
+    }
+
     name = fields.Char()
     crm_defect_idt = fields.Char('CRM Defect ID', help=""" The identifier of the defect in the vendor's CRM """)
     external_defect_idt = fields.Char('External Defect ID', help=""" The identifier of the defect in your bug tracking tool """)
@@ -123,6 +133,7 @@ class afo_delivery_environment_delivery(models.Model):
     def write(self, cr, uid, ids, vals, context=None):
         res = super(afo_delivery_environment_delivery, self).write(cr, uid, ids, vals, context=context)
         env_obj = self.pool.get('afo_delivery.environment')
+        del_obj = self.pool.get('afo_delivery.delivery')
         for rec in self.browse(cr, uid, ids, context=context):
             message = '<span>[%s] - Delivery [%s] was changed</span> <br/>' % (rec.environment_id.name, rec.delivery_id.name)
             if rec.install_status == 'planned':
@@ -137,6 +148,7 @@ class afo_delivery_environment_delivery(models.Model):
             elif rec.install_status == 'completed':
                 message += 'Successfully deployed!'
             env_obj.message_post(cr, uid, [rec.environment_id.id], body=message, context=context, subtype='mt_env_delivery_changed')
+            del_obj.message_post(cr, uid, [rec.delivery_id.id], body=message, context=context, subtype='mt_del_deployed')
         return res
 
 class afo_delivery_delivery_component(models.Model):

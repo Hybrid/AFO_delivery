@@ -13,5 +13,17 @@
             <field name="default" eval="True"/>
             <field name="description"></field>
         </record>
+        <record id="mt_del_status" model="mail.message.subtype">
+            <field name="name">Delivery status changed:</field>
+            <field name="res_model">afo_delivery.delivery</field>
+            <field name="default" eval="True"/>
+            <field name="description"></field>
+        </record>
+        <record id="mt_del_deployed" model="mail.message.subtype">
+            <field name="name">Deployment</field>
+            <field name="res_model">afo_delivery.delivery</field>
+            <field name="default" eval="True"/>
+            <field name="description"></field>
+        </record>
     </data>
 </openerp>
