@@ -68,6 +68,7 @@ class afo_delivery_environment_component(models.Model):
 
 class afo_delivery_delivery(models.Model):
     _name = 'afo_delivery.delivery'
+    _order = 'delivery_date desc'
 
     name = fields.Char()
     crm_defect_idt = fields.Char('CRM Defect ID', help=""" The identifier of the defect in the vendor's CRM """)
@@ -96,6 +97,8 @@ class afo_delivery_delivery(models.Model):
     
 class afo_delivery_environment_delivery(models.Model):
     _name = 'afo_delivery.environment_delivery'
+
+    _order = 'install_date desc, planned_date desc'
 
     name = fields.Char(compute='_compute_name')
     environment_id = fields.Many2one('afo_delivery.environment', 'Environment', required=True)
